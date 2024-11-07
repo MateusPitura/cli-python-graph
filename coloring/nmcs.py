@@ -4,6 +4,7 @@ import networkx as nx
 import read_dimacs
 import heapq # Fila de prioridade
 import copy # Para copiar o estado atual do grafo
+from visualiser.visualiser import Visualiser as vs
 
 class VertexQueue: # Cria uma fila de prioridade máxima para os vértices pelo grau # TODO: teria que usar DSATUR também, porém a fila deveria alterar enquanto o grafo é colorido
   def __init__(self, graph):
@@ -11,6 +12,7 @@ class VertexQueue: # Cria uma fila de prioridade máxima para os vértices pelo 
     self.queue = []
     for vertex in graph.nodes():
       heapq.heappush(self.queue, (-graph.degree(vertex), vertex)) # heapq é uma fila de prioriedade mínima, por isso "-" na frente
+    print(self.queue)
 
   def pop(self):
     return heapq.heappop(self.queue)[1] # [1] pois pega o vértice, [0] seria o grau
@@ -37,7 +39,7 @@ class State:
         return possible_moves
       return [(vertex, 0)] # TODO: melhorar as cores inválidas retornadas
 
-    def play(self, move): # Quanto de fato colore um vértice
+    def play(self, move): # Quando de fato colore um vértice
         vertex, color = move
         self.coloring[vertex] = color
 
@@ -67,6 +69,12 @@ def score(state): # Verifica quantos conflitos existem no grafo, isto é, quanto
 import random
 import networkx as nx
 
+@vs(
+  ignore_args=["state", "policy", "vertex_queue"], # Argumentos que não serão mostrados
+  show_return_value=False, # Não mostrar o valor de retorno
+  show_argument_name=False,  # Não mostra o nome do argumento
+  node_properties_kwargs={"shape":"record", "color":"#f57542", "style":"filled", "fillcolor":"grey"} # Estilização
+)
 def nmcs(state, policy, vertex_queue, level):
     if level == 0:
         return playout(state, policy, vertex_queue)
@@ -78,7 +86,7 @@ def nmcs(state, policy, vertex_queue, level):
         possible_moves = state.get_possible_moves(vertex_queue.pop())
         for move in possible_moves:
             state.play(move)
-            score, sequence = nmcs(copy.deepcopy(state), policy, copy.deepcopy(vertex_queue), level - 1)
+            score, sequence = nmcs(state=copy.deepcopy(state), policy=policy, vertex_queue=copy.deepcopy(vertex_queue), level=level - 1)
             if score > best_score:
                 best_score = score
                 best_sequence = sequence + [move]
@@ -89,7 +97,8 @@ def main():
     state = State(graph, 3)
     policy = {(vertex, color): 0 for vertex in state.graph.nodes() for color in range(state.max_colors)} # Irá retornar {(0, 0): 0, ..., (0, 2): 0}, onde o 1º elemento é o vértice e o 2º a cor, cada tupla terá a mesma probabilidade de ser escolhida 
     vertex_queue = VertexQueue(graph)
-    print('nmcs', nmcs(state, policy, vertex_queue, 3)) # Irá retornar algo como (10, [(4, 2), (1, 2), (2, 1), (3, 0), (5, 3), (0, 0), (6, 1)]), onde 10 seria o score e as tuplas os vértices coloridos
+    print('nmcs', nmcs(state=state, policy=policy, vertex_queue=vertex_queue, level=3)) # Irá retornar algo como (10, [(4, 2), (1, 2), (2, 1), (3, 0), (5, 3), (0, 0), (6, 1)]), onde 10 seria o score e as tuplas os vértices coloridos
+    vs.make_animation("ncms.gif") 
 
 if __name__ == "__main__":
     main()
