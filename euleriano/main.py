@@ -41,7 +41,7 @@ class Grafo:
             print(
                 f'Existe {self.grafo[u-1][v-1]} de arestas entre os vértices {u} e {v}')
 
-    def is_euleriano(self):
+    def euleriano(self):
         """
             Verifica se o grafo é euleriano ou semi-euleriano
         """
@@ -68,5 +68,5 @@ g = Grafo(4)
 g.adiciona_aresta(1, 2)
 g.adiciona_aresta(3, 4)
 g.adiciona_aresta(2, 3)
-g.is_euleriano()
+g.euleriano()
 g.mostra_grafo()
