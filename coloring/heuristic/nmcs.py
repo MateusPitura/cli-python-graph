@@ -177,7 +177,7 @@ def nmcs(state, policy, vertex_queue, level):
 def main():
     """
         Cria um grafo a partir de um arquivo DIMACS
-        Colore usando o algoritmo de NCMS, irá gerar um PNG e GIF da árvore de recursão
+        Colore usando o algoritmo de NMCS, irá gerar um PNG e GIF da árvore de recursão
         Chame com python3 nmcs.py
         TODO: também exibir a animação de coloração
     """
